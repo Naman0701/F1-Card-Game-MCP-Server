@@ -1,8 +1,12 @@
+import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from fastmcp import FastMCP  # noqa: E402
+from starlette.requests import Request  # noqa: E402
+from starlette.responses import PlainTextResponse  # noqa: E402
 
 from src.resources.game_resources import (
     get_drivers,
@@ -40,5 +44,10 @@ mcp.tool()(get_hand)
 mcp.tool()(get_game_status)
 mcp.tool()(get_leaderboard)
 
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request: Request) -> PlainTextResponse:
+    return PlainTextResponse("OK")
+
+
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="http", host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
