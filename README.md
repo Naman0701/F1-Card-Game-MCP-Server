@@ -4,6 +4,64 @@ A Formula 1 themed card game built as an MCP (Model Context Protocol) server. Pl
 
 ---
 
+## How to Run
+
+### Prerequisites
+
+- Python 3.13+
+- [uv](https://docs.astral.sh/uv/) — install with `pip install uv`
+
+### Steps
+
+**1. Clone this repo**
+
+```bash
+git clone https://github.com/naman/F1-Card-Game-MCP-Server.git
+cd F1-Card-Game-MCP-Server
+```
+
+**2. Install dependencies**
+
+```bash
+uv sync
+```
+
+**3. Create a `.env` file**
+
+```bash
+touch .env
+```
+
+Contact **NA** (nnaman33@gmail.com) for the `.env` secrets (`DATABASE_URL`, `AUTH_SECRET_KEY`).
+
+**4. Add the MCP server to your config**
+
+Add the following to your MCP server config file (e.g. `~/.cursor/mcp.json` or Claude Desktop config):
+
+```json
+{
+  "mcpServers": {
+    "F1 Card Game": {
+      "command": "<path to uv, run `which uv` to get this>",
+      "args": [
+        "run",
+        "--directory",
+        "<path to repo>",
+        "fastmcp",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
+```
+
+> Replace `<path to uv>` with the output of `which uv` and `<path to repo>` with the absolute path to the cloned repository.
+
+**5. Done!** Restart your MCP client and start playing.
+
+---
+
 ## Game Overview
 
 Two players (human + AI) each receive 5 random F1 driver cards. Over 5 rounds, tracks are revealed one-by-one, and both players simultaneously play a card. The driver's skills combined with their track multiplier determine the round winner. After all 5 rounds, the overall winner earns leaderboard points.
@@ -362,37 +420,7 @@ vs.
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Python 3.13+
-- [uv](https://docs.astral.sh/uv/) (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
-- PostgreSQL running locally or remotely
-
-### Setup
-
-```bash
-# Clone and install dependencies
-git clone <repo-url>
-cd f1-mcp-server
-uv sync
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your DATABASE_URL and AUTH_SECRET_KEY
-
-# Run database migrations
-uv run alembic upgrade head
-
-# Seed F1 data (drivers, teams, tracks, skills, multipliers)
-uv run python -m src.services.seed_service
-
-# Run the MCP server
-uv run python server.py
-```
-
-### Environment Variables
+## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|

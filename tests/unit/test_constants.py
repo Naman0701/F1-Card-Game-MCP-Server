@@ -2,19 +2,21 @@
 
 from src.data.constants import (
     CARDS_PER_PLAYER,
-    COUNTRIES,
-    DRIVER_SKILL_OVERRIDES,
-    DRIVERS,
     NAME_PATTERN,
     POINTS_GAME_LOSS_PENALTY,
     POINTS_GAME_WIN_BONUS,
     POINTS_PER_ROUND_DRAW,
     POINTS_PER_ROUND_WIN,
     ROUNDS_PER_GAME,
-    SKILLS,
-    TEAMS,
     TRACK_MULTIPLIER_MAX,
     TRACK_MULTIPLIER_MIN,
+)
+from src.data.seed_data import (
+    COUNTRIES,
+    DRIVER_SKILL_OVERRIDES,
+    DRIVERS,
+    SKILLS,
+    TEAMS,
     TRACKS,
 )
 

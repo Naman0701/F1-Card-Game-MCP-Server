@@ -330,7 +330,7 @@ async def seed_driver_track_relations(
         driver_id = driver_ids[driver_name]
         track_id = track_ids[track_name]
 
-        exists = (
+        existing = (
             await session.execute(
                 select(DriverTrackRel).where(
                     DriverTrackRel.driver_id == driver_id,
@@ -338,14 +338,14 @@ async def seed_driver_track_relations(
                 )
             )
         ).scalar_one_or_none()
-        if exists:
-            continue
-
-        session.add(
-            DriverTrackRel(
-                driver_id=driver_id, track_id=track_id, multiplier=multiplier
+        if existing:
+            existing.multiplier = multiplier
+        else:
+            session.add(
+                DriverTrackRel(
+                    driver_id=driver_id, track_id=track_id, multiplier=multiplier
+                )
             )
-        )
 
     await session.flush()
     logger.info("Seeded driver-track multipliers")

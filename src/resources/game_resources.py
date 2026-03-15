@@ -12,11 +12,11 @@ from src.data.constants import (
     POINTS_PER_ROUND_DRAW,
     POINTS_PER_ROUND_WIN,
     ROUNDS_PER_GAME,
-    SKILLS,
     TRACK_MULTIPLIER_DEFAULT,
     TRACK_MULTIPLIER_MAX,
     TRACK_MULTIPLIER_MIN,
 )
+from src.data.seed_data import SKILLS
 from src.models.base import async_session
 from src.models.driver import Driver
 from src.models.relations import DriverSkillRel, TeamDriverRel

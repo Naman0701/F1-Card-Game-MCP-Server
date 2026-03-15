@@ -13,11 +13,13 @@ from typing import Any
 
 import httpx
 
-from src.data.constants import (
+from src.data.constants import ERGAST_BASE_URL, TRACK_MULTIPLIER_DEFAULT
+from src.data.seed_data import (
     COUNTRIES,
+    DRIVER_CIRCUIT_TYPE_AFFINITY,
     DRIVER_SKILL_OVERRIDES,
+    DRIVER_TRACK_OVERRIDES,
     DRIVERS,
-    ERGAST_BASE_URL,
     SKILLS,
     TEAMS,
     TRACKS,
@@ -337,11 +339,12 @@ def compute_all_track_multipliers(
     drivers: list[dict[str, Any]] | None = None,
     tracks: list[dict[str, Any]] | None = None,
 ) -> list[tuple[str, str, float]]:
-    """Compute track affinity multipliers for every driver × track pair.
+    """Look up curated track affinity multipliers for every driver × track pair.
 
-    Uses deterministic SHA-256 hashing so results are reproducible.
-    Higher-ranked drivers get a slight upward bias. Each driver also
-    gets a per-circuit-type affinity adjustment.
+    Resolution order for each (driver, track) combination:
+      1. DRIVER_TRACK_OVERRIDES  — specific driver+track entry
+      2. DRIVER_CIRCUIT_TYPE_AFFINITY — driver's affinity for the track's circuit type
+      3. TRACK_MULTIPLIER_DEFAULT (1.0)
 
     Args:
         drivers: Pre-fetched driver list, or None to auto-fetch.
@@ -359,22 +362,17 @@ def compute_all_track_multipliers(
     results: list[tuple[str, str, float]] = []
     for drv in drivers:
         name = drv["name"]
-        serial = drv["id"]
+        track_overrides = DRIVER_TRACK_OVERRIDES.get(name, {})
+        type_affinities = DRIVER_CIRCUIT_TYPE_AFFINITY.get(name, {})
+
         for trk in tracks:
             track_name = trk["name"]
             circuit_type = trk["circuit_type"]
 
-            digest = hashlib.sha256(f"{name}|{track_name}".encode()).digest()
-            v1 = digest[0] / 255.0
-            v2 = digest[1] / 255.0
-            base = 0.65 + ((v1 + v2) / 2) * 1.05
-
-            type_digest = hashlib.sha256(f"{name}|{circuit_type}".encode()).digest()
-            type_adj = (type_digest[0] / 255.0 - 0.5) * 0.3
-
-            rank_bonus = max(0, (30 - serial) * 0.004)
-
-            multiplier = round(min(2.0, max(0.5, base + type_adj + rank_bonus)), 2)
+            multiplier = track_overrides.get(
+                track_name,
+                type_affinities.get(circuit_type, TRACK_MULTIPLIER_DEFAULT),
+            )
             results.append((name, track_name, multiplier))
 
     return results
